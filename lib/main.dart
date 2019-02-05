@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gmail/ThreadSummary.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Flutter Gmail Clone'),
     );
   }
 }
@@ -26,13 +27,29 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  var _threads = <ThreadSummary>[
+    ThreadSummary(
+      sender: ['sender 1', 'sender 2'],
+      subject: 'test',
+      snippet: 'snippet',
+      attachments: ['attachment1', 'attachement2'],
+      avatarUrl: 'https://randomuser.me/api/portraits/men/0.jpg',
+    ),
+    ThreadSummary(
+      sender: ['sender 1'],
+      subject: 'test test test ',
+      snippet: 'snippet',
+      attachments: [],
+      avatarUrl: 'https://randomuser.me/api/portraits/men/0.jpg',
+    ),
+    ThreadSummary(
+      sender: ['sender 3', 'sender 2', 'sender 4'],
+      subject: 'hello world',
+      snippet: 'snippet',
+      attachments: ['attachment1'],
+      avatarUrl: 'https://randomuser.me/api/portraits/men/0.jpg',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +60,10 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: ListView.builder(
           itemBuilder: _itemBuilder,
-          itemCount: 5,
+          itemCount: _threads.length,
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ),
@@ -55,45 +71,43 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _itemBuilder(BuildContext context, int index) {
+    final thread = _threads[index];
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           CircleAvatar(
-            child: Text('$index'),
+            backgroundImage: NetworkImage(thread.avatarUrl),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Sender $index'),
-                Text('Subject $index'),
-                Text('Snippet $index'),
+                Text(thread.sender.join(",")),
+                Text(thread.subject),
+                Text(thread.snippet),
                 Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: OutlineButton(
-                        onPressed: () => print('pressed'),
-                        child: Text('Attachment 1'),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0)),
-                      ),
-                    ),
-                    OutlineButton(
-                      onPressed: () => print('pressed'),
-                      child: Text('Attachment 1'),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0)),
-                    ),
-                  ],
+                  children:
+                      thread.attachments.map(_buildAttachmentButton).toList(),
                 )
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Padding _buildAttachmentButton(String attachment) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: OutlineButton(
+        onPressed: () => print('pressed'),
+        child: Text(attachment),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
       ),
     );
   }
