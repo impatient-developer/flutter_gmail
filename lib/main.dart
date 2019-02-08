@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gmail/ThreadSummary.dart';
+import 'package:quiver/iterables.dart' as iter;
+import 'package:random_user/models.dart';
+import 'package:random_user/random_user.dart';
+import 'package:flutter_lorem/flutter_lorem.dart';
 
 void main() => runApp(MyApp());
 
@@ -27,29 +31,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var _threads = <ThreadSummary>[
-    ThreadSummary(
-      sender: ['sender 1', 'sender 2'],
-      subject: 'test',
-      snippet: 'snippet',
-      attachments: ['attachment1', 'attachement2'],
-      avatarUrl: 'https://randomuser.me/api/portraits/men/0.jpg',
-    ),
-    ThreadSummary(
-      sender: ['sender 1'],
-      subject: 'test test test ',
-      snippet: 'snippet',
-      attachments: [],
-      avatarUrl: 'https://randomuser.me/api/portraits/men/0.jpg',
-    ),
-    ThreadSummary(
-      sender: ['sender 3', 'sender 2', 'sender 4'],
-      subject: 'hello world',
-      snippet: 'snippet',
-      attachments: ['attachment1'],
-      avatarUrl: 'https://randomuser.me/api/portraits/men/0.jpg',
-    ),
-  ];
+  var _threads = <ThreadSummary>[];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    RandomUser().getUsers(results: 50).then(_updateThreads);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(thread.sender.join(",")),
+                Text(thread.sender.join(',')),
                 Text(thread.subject),
                 Text(thread.snippet),
                 Row(
@@ -109,6 +97,28 @@ class _MyHomePageState extends State<MyHomePage> {
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
       ),
+    );
+  }
+
+  void _updateThreads(List<User> users) {
+    setState(() {
+      _threads = _generateThreadSummaries(users);
+    });
+  }
+
+  List<ThreadSummary> _generateThreadSummaries(List<User> users) {
+    return iter.partition(users, 5).map(_generateOneThread).toList();
+  }
+
+  ThreadSummary _generateOneThread(List users) {
+    final senders = users.cast<User>();
+
+    return ThreadSummary(
+      sender: senders.map((user) => user.name.first).toList(),
+      avatarUrl: senders.last.picture.medium,
+      subject: lorem(paragraphs: 1, words: 4),
+      snippet: lorem(paragraphs: 1, words: 4),
+      attachments: [],
     );
   }
 }

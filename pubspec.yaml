@@ -20,6 +20,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
 
+  quiver: '>=2.0.0 <3.0.0'
+  random_user: ^0.1.0
+  flutter_lorem: ^1.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
