@@ -4,6 +4,7 @@ class ThreadSummary {
   String snippet;
   List<String> attachments;
   String avatarUrl;
+  int unreadCount;
 
   ThreadSummary({
     this.sender,
@@ -11,5 +12,6 @@ class ThreadSummary {
     this.snippet,
     this.attachments,
     this.avatarUrl,
+    this.unreadCount,
   });
 }

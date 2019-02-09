@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gmail/ThreadSummary.dart';
 import 'package:quiver/iterables.dart' as iter;
@@ -31,6 +33,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final _random = Random();
   var _threads = <ThreadSummary>[];
 
   @override
@@ -73,8 +76,8 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(thread.sender.join(',')),
-                Text(thread.subject),
+                _buildSenderList(thread),
+                _buildSubject(thread),
                 Text(thread.snippet),
                 Row(
                   children:
@@ -93,7 +96,12 @@ class _MyHomePageState extends State<MyHomePage> {
       padding: const EdgeInsets.only(right: 8.0),
       child: OutlineButton(
         onPressed: () => print('pressed'),
-        child: Text(attachment),
+        child: Row(
+          children: <Widget>[
+            Icon(Icons.image),
+            Text(attachment),
+          ],
+        ),
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
       ),
@@ -112,13 +120,43 @@ class _MyHomePageState extends State<MyHomePage> {
 
   ThreadSummary _generateOneThread(List users) {
     final senders = users.cast<User>();
+    final attachmentCount = max(0, _random.nextInt(6) - 3);
 
     return ThreadSummary(
       sender: senders.map((user) => user.name.first).toList(),
       avatarUrl: senders.last.picture.medium,
       subject: lorem(paragraphs: 1, words: 4),
       snippet: lorem(paragraphs: 1, words: 4),
-      attachments: [],
+      unreadCount: _random.nextInt(senders.length + 1),
+      attachments: List.generate(
+          attachmentCount, (_) => lorem(paragraphs: 1, words: 1) + 'jpg'),
     );
+  }
+
+  Widget _buildSubject(ThreadSummary thread) {
+    if (thread.unreadCount > 0) {
+      return _boldText(thread.subject);
+    }
+    return Text(thread.subject);
+  }
+
+  Widget _buildSenderList(ThreadSummary thread) {
+    if (thread.unreadCount == 0) {
+      return Text(thread.sender.join(','));
+    }
+    final readCount = thread.sender.length - thread.unreadCount;
+    if (readCount == 0) {
+      return _boldText(thread.sender.join(','));
+    }
+    return Row(
+      children: <Widget>[
+        Text(thread.sender.take(readCount).join(',') + ','),
+        _boldText(thread.sender.skip(readCount).join(',')),
+      ],
+    );
+  }
+
+  Text _boldText(String text) {
+    return Text(text, style: TextStyle(fontWeight: FontWeight.bold));
   }
 }
