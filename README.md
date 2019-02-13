@@ -8,3 +8,4 @@
 * Step 2: Drive UI with Data Model: https://youtu.be/fKXxAhAyqTY
 * Step 3: Realistic Mock with Better Fake Data: https://youtu.be/gjrI2T5WHZM
 * Step 4: Conditional Widget Building: https://youtu.be/OAyTiekTuLk
+* Step 5: Navigate to Detail Page: https://youtu.be/sKEyQWcAbow
