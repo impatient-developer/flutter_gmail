@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gmail/ThreadSummary.dart';
-import 'package:quiver/iterables.dart' as iter;
+import 'package:quiver/iterables.dart' show partition;
 import 'package:random_user/models.dart';
 import 'package:random_user/random_user.dart';
 import 'package:flutter_lorem/flutter_lorem.dart';
@@ -63,30 +63,40 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _itemBuilder(BuildContext context, int index) {
     final thread = _threads[index];
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          CircleAvatar(
-            backgroundImage: NetworkImage(thread.avatarUrl),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                _buildSenderList(thread),
-                _buildSubject(thread),
-                Text(thread.snippet),
-                Row(
-                  children:
-                      thread.attachments.map(_buildAttachmentButton).toList(),
-                )
-              ],
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DetailPage(
+                      thread: thread,
+                    )));
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            CircleAvatar(
+              backgroundImage: NetworkImage(thread.avatarUrl),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _buildSenderList(thread),
+                  _buildSubject(thread),
+                  Text(thread.snippet),
+                  Row(
+                    children:
+                        thread.attachments.map(_buildAttachmentButton).toList(),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -115,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<ThreadSummary> _generateThreadSummaries(List<User> users) {
-    return iter.partition(users, 5).map(_generateOneThread).toList();
+    return partition(users, 5).map(_generateOneThread).toList();
   }
 
   ThreadSummary _generateOneThread(List users) {
@@ -123,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final attachmentCount = max(0, _random.nextInt(6) - 3);
 
     return ThreadSummary(
-      sender: senders.map((user) => user.name.first).toList(),
+      senders: senders.map((user) => user.name.first).toList(),
       avatarUrl: senders.last.picture.medium,
       subject: lorem(paragraphs: 1, words: 4),
       snippet: lorem(paragraphs: 1, words: 4),
@@ -142,21 +152,62 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildSenderList(ThreadSummary thread) {
     if (thread.unreadCount == 0) {
-      return Text(thread.sender.join(','));
+      return Text(thread.senders.join(','));
     }
-    final readCount = thread.sender.length - thread.unreadCount;
+    final readCount = thread.senders.length - thread.unreadCount;
     if (readCount == 0) {
-      return _boldText(thread.sender.join(','));
+      return _boldText(thread.senders.join(','));
     }
     return Row(
       children: <Widget>[
-        Text(thread.sender.take(readCount).join(',') + ','),
-        _boldText(thread.sender.skip(readCount).join(',')),
+        Text(thread.senders.take(readCount).join(',') + ','),
+        _boldText(thread.senders.skip(readCount).join(',')),
       ],
     );
   }
 
   Text _boldText(String text) {
     return Text(text, style: TextStyle(fontWeight: FontWeight.bold));
+  }
+}
+
+class DetailPage extends StatelessWidget {
+  final ThreadSummary thread;
+
+  const DetailPage({Key key, @required this.thread}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView.separated(
+          itemBuilder: _buildOneMessage,
+          separatorBuilder: (context, index) => Divider(color: Colors.grey),
+          itemCount: thread.senders.length,
+        ),
+      ),
+    );
+  }
+
+  Column _buildOneMessage(BuildContext context, int index) {
+    String sender = thread.senders[index];
+    return Column(
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            CircleAvatar(
+              child: Text(sender[0]),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(sender),
+            ),
+          ],
+        ),
+        Text(lorem(paragraphs: 3, words: 100)),
+      ],
+    );
   }
 }

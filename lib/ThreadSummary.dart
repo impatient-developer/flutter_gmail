@@ -1,5 +1,5 @@
 class ThreadSummary {
-  List<String> sender;
+  List<String> senders;
   String subject;
   String snippet;
   List<String> attachments;
@@ -7,7 +7,7 @@ class ThreadSummary {
   int unreadCount;
 
   ThreadSummary({
-    this.sender,
+    this.senders,
     this.subject,
     this.snippet,
     this.attachments,
