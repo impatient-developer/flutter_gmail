@@ -9,3 +9,5 @@
 * Step 3: Realistic Mock with Better Fake Data: https://youtu.be/gjrI2T5WHZM
 * Step 4: Conditional Widget Building: https://youtu.be/OAyTiekTuLk
 * Step 5: Navigate to Detail Page: https://youtu.be/sKEyQWcAbow
+* Step 6: Organize Multi-Page Code Structure: https://youtu.be/K0IHD-xB-Bc
+* Step 7: Create Your Own Widget: https://youtu.be/lQiF1YSTLIg
